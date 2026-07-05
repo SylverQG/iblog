@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <AppHeader />
-    <main class="flex-1">
+    <component :is="headerComponent" />
+    <main class="flex-1 w-full px-6 py-8">
       <NuxtPage />
     </main>
     <component :is="footerComponent" />
@@ -15,6 +15,7 @@ onMounted(() => {
   initFromStorage()
 })
 
+const headerComponent = computed(() => getTemplateComponent('AppHeader'))
 const footerComponent = computed(() => getTemplateComponent('Footer'))
 
 useSeoMeta({
