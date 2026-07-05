@@ -11,6 +11,9 @@ importers:
       '@nuxtjs/color-mode':
         specifier: ^4.0.1
         version: 4.0.1(magicast@0.5.3)
+      katex:
+        specifier: ^0.17.0
+        version: 0.17.0
       marked:
         specifier: ^18.0.5
         version: 18.0.5
@@ -1822,6 +1825,10 @@ packages:
   commander@2.20.0:
     resolution: {integrity: sha512-7j2y+40w61zy6YC2iRNpUe/NwhNyoXrYpHMrSunaMG64nRnaf96zO/KMQR4OyN/UnE5KLyEBnKHd4aG3rskjpQ==}
 
+  commander@8.3.0:
+    resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
+    engines: {node: '>= 12'}
+
   commondir@1.0.1:
     resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
 
@@ -2392,6 +2399,10 @@ packages:
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
+    hasBin: true
+
+  katex@0.17.0:
+    resolution: {integrity: sha512-Vdw0ATsQ9V+LuegM/BTwQqV/6cTl5lbGcIrU+BCgLxyf6bo38ybOr372tuSIxir3CN720flu1meYR6XzNMwQnw==}
     hasBin: true
 
   kleur@4.1.5:
@@ -5451,6 +5462,8 @@ snapshots:
 
   commander@2.20.0: {}
 
+  commander@8.3.0: {}
+
   commondir@1.0.1: {}
 
   compatx@0.2.0: {}
@@ -5983,6 +5996,10 @@ snapshots:
   json-with-bigint@3.5.8: {}
 
   json5@2.2.3: {}
+
+  katex@0.17.0:
+    dependencies:
+      commander: 8.3.0
 
   kleur@4.1.5: {}
 

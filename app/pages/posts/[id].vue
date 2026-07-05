@@ -15,7 +15,8 @@
             </span>
           </div>
           <div class="flex flex-wrap gap-2">
-            <TagBadge
+            <component
+              :is="TagBadgeComponent"
               v-for="label in post.labels"
               :key="label"
               :tag="label"
@@ -36,18 +37,19 @@
 </template>
 
 <script setup lang="ts">
-import { marked } from 'marked'
 import type { BlogPost } from '~/server/types/blog'
+
+const { getTemplateComponent } = useTemplate()
+const TagBadgeComponent = computed(() => getTemplateComponent('TagBadge'))
 
 const route = useRoute()
 const id = Number(route.params.id)
 
-const { data } = await useFetch<BlogPost>(`/api/posts/${id}`)
+const { data } = await useFetch<BlogPost & { bodyHtml: string }>(`/api/posts/${id}`)
 const post = computed(() => data.value)
 
 const renderedBody = computed(() => {
-  if (!post.value?.body) return ''
-  return marked(post.value.body, { async: false }) as string
+  return post.value?.bodyHtml ?? ''
 })
 
 useSeoMeta({

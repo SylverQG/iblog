@@ -47,10 +47,34 @@ export async function fetchPostById(id: number): Promise<BlogPost | null> {
 
     if (issue.pull_request) return null
 
+    let body = issue.body || ''
+
+    const { data: comments } = await octokit.rest.issues.listComments({
+      owner,
+      repo,
+      issue_number: id,
+      per_page: 100,
+    })
+
+    const ownerComments = comments.filter((c) => c.user?.login === owner)
+    if (ownerComments.length > 0) {
+      const commentBlocks = ownerComments.map((c) => {
+        const date = new Date(c.created_at).toLocaleDateString('zh-CN', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+        return `\n\n---\n\n> *${owner} · ${date}*\n\n${c.body || ''}`
+      })
+      body += commentBlocks.join('')
+    }
+
     return {
       id: issue.number,
       title: issue.title,
-      body: issue.body || '',
+      body,
       labels: issue.labels.map((label) => (typeof label === 'string' ? label : label.name || '')),
       createdAt: issue.created_at,
       updatedAt: issue.updated_at,

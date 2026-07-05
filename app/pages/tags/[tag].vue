@@ -2,7 +2,7 @@
   <div class="max-w-4xl mx-auto px-4 py-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">
-        标签：<TagBadge :tag="tagName" class="inline-flex" />
+        标签：<component :is="TagBadgeComponent" :tag="tagName" class="inline-flex" />
       </h1>
       <p class="text-gray-500 dark:text-gray-400">
         共 {{ posts?.length ?? 0 }} 篇文章
@@ -18,9 +18,10 @@
     </div>
 
     <div v-else class="grid gap-4">
-      <PostCard
+      <component
         v-for="post in posts"
         :key="post.id"
+        :is="PostCardComponent"
         :post="post"
       />
     </div>
@@ -35,6 +36,10 @@
 
 <script setup lang="ts">
 import type { PostsResponse } from '~/server/types/blog'
+
+const { getTemplateComponent } = useTemplate()
+const PostCardComponent = computed(() => getTemplateComponent('PostCard'))
+const TagBadgeComponent = computed(() => getTemplateComponent('TagBadge'))
 
 const route = useRoute()
 const tagName = route.params.tag as string

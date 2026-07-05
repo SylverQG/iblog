@@ -14,8 +14,9 @@
         <NuxtLink to="/about" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
           关于
         </NuxtLink>
+        <TemplateSelector />
         <button
-          class="ml-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           @click="toggleColorMode"
           :title="colorMode === 'dark' ? '切换到亮色模式' : '切换到暗色模式'"
         >

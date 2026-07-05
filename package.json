@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@nuxtjs/color-mode": "^4.0.1",
+    "katex": "^0.17.0",
     "marked": "^18.0.5",
     "nuxt": "^4.4.8",
     "octokit": "^5.0.5",

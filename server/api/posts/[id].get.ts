@@ -1,4 +1,5 @@
 import { fetchPostById } from '../../utils/github'
+import { renderBodyWithCache } from '../../utils/markdown'
 
 export default defineEventHandler(async (event) => {
   const id = Number(event.context.params?.id)
@@ -11,5 +12,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Post not found' })
   }
 
-  return post
+  return {
+    ...post,
+    bodyHtml: renderBodyWithCache(post.body),
+  }
 })

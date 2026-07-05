@@ -16,9 +16,10 @@
     </div>
 
     <div v-else class="grid gap-4">
-      <PostCard
+      <component
         v-for="post in posts"
         :key="post.id"
+        :is="PostCardComponent"
         :post="post"
       />
     </div>
@@ -27,6 +28,9 @@
 
 <script setup lang="ts">
 import type { PostsResponse } from '~/server/types/blog'
+
+const { getTemplateComponent } = useTemplate()
+const PostCardComponent = computed(() => getTemplateComponent('PostCard'))
 
 const { data } = await useFetch<PostsResponse>('/api/posts')
 const posts = computed(() => data.value?.posts ?? [])

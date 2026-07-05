@@ -14,6 +14,7 @@
 |------|------|------|
 | `SylverQG/Blogs` | **内容仓库** — Issues 作为博客内容源（已有 10 篇博客） | 在此提 Issue = 写博客 |
 | `SylverQG/iblog` | **代码仓库** — Nuxt 4 项目源码 | 部署到 Vercel，从 Blogs 仓库读取 Issues |
+| `SylverQG/iblog-template` | **模板仓库** — 前端主题模板 | 通过 Git Submodule 引入，iBlog 动态切换 |
 
 ---
 
@@ -101,7 +102,52 @@ iblog/
 
 ---
 
-## 5. GitHub 仓库 & Issues 规划
+## 5. 模板系统
+
+### 三个仓库
+
+| 仓库 | 用途 |
+|------|------|
+| `SylverQG/iblog` | 博客主项目（代码 + API + 核心逻辑） |
+| `SylverQG/Blogs` | 博客内容源（Issues 写博客） |
+| `SylverQG/iblog-template` | **前端模板集合**，通过 Git Submodule 引入 |
+
+### 集成方式：Git Submodule
+
+`iblog-template` 作为 Git Submodule 挂载在 `iblog/templates/iblog-template/` 目录下。
+
+```bash
+# 初始化时
+git submodule add https://github.com/SylverQG/iblog-template.git templates/iblog-template
+
+# 克隆项目时初始化子模块
+git clone --recursive https://github.com/SylverQG/iblog.git
+# 或现有仓库拉取子模块
+git submodule update --init --recursive
+
+# 更新模板到最新
+git submodule update --remote
+```
+
+### 模板切换机制
+
+- iBlog 前端提供**切换按钮**，点击后将 `TEMPLATE_NAME` 存入 `localStorage`
+- 根据当前 `TEMPLATE_NAME`（`minimal` / `card` / `terminal`）动态加载对应的组件和 CSS
+- 默认使用 `minimal` 模板
+
+### 可用模板
+
+| 模板 | 风格 | 特点 |
+|------|------|------|
+| `minimal` | 简约风 | 干净留白，阅读优先 |
+| `card` | 卡片杂志风 | 双列网格，侧边栏标签云 |
+| `terminal` | 极客终端风 | 深色背景，等宽字体，终端交互感 |
+
+详情见 `templates/iblog-template/pre.md` 或 [SylverQG/iblog-template](https://github.com/SylverQG/iblog-template)。
+
+---
+
+## 6. GitHub 仓库 & Issues 规划
 
 ### 两个仓库
 

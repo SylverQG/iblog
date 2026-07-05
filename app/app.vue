@@ -4,13 +4,19 @@
     <main class="flex-1">
       <NuxtPage />
     </main>
-    <footer class="border-t border-gray-200 dark:border-gray-800 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
-      &copy; {{ new Date().getFullYear() }} iBlog. Powered by Nuxt &amp; GitHub Issues.
-    </footer>
+    <component :is="footerComponent" />
   </div>
 </template>
 
 <script setup lang="ts">
+const { initFromStorage, getTemplateComponent } = useTemplate()
+
+onMounted(() => {
+  initFromStorage()
+})
+
+const footerComponent = computed(() => getTemplateComponent('Footer'))
+
 useSeoMeta({
   title: 'iBlog',
   description: 'A personal blog powered by GitHub Issues',
