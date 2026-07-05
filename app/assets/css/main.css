@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* 扫描 git submodule 里的模板文件，否则模板里用到的 Tailwind 类不会被生成 */
+@source "../../../templates/iblog-template/templates/**/*.{vue,css}";
+
 /* 让 dark: 变体跟随 HTML 上的 .dark 类，而非系统偏好 */
 @custom-variant dark (&:where(.dark, .dark *));
 

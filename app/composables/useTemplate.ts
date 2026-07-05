@@ -1,13 +1,13 @@
 import type { Component } from 'vue'
 
-const TEMPLATES = {
+export const TEMPLATES = {
   original: { name: 'original', displayName: '原始风格', description: '经典简约，Tailwind 原生样式' },
   minimal: { name: 'minimal', displayName: '简约风', description: '干净留白，阅读优先' },
   card: { name: 'card', displayName: '卡片杂志风', description: '双列网格，侧边栏标签云' },
   terminal: { name: 'terminal', displayName: '极客终端风', description: '深色背景，等宽字体' },
 } as const
 
-type TemplateName = keyof typeof TEMPLATES
+export type TemplateName = keyof typeof TEMPLATES
 
 const templateComponents: Record<TemplateName, Record<string, () => Promise<{ default: Component }>>> = {
   original: {
@@ -48,24 +48,33 @@ const templateComponents: Record<TemplateName, Record<string, () => Promise<{ de
 const asyncComponentCache: Record<string, Component> = {}
 
 export function useTemplate() {
-  const template = useState<TemplateName>('template-name', () => 'original')
+  const templateCookie = useCookie<TemplateName>('iblog-template', {
+    default: () => 'original',
+    maxAge: 60 * 60 * 24 * 365,
+  })
+  const template = useState<TemplateName>('template-name', () => templateCookie.value)
+
+  // 一次性迁移：旧版 localStorage 模板偏好迁移到 cookie
+  if (import.meta.client) {
+    const saved = localStorage.getItem('iblog-template') as TemplateName | null
+    if (saved && saved in TEMPLATES) {
+      templateCookie.value = saved
+      template.value = saved
+      localStorage.removeItem('iblog-template')
+    }
+  }
+
+  watch(template, (newVal) => {
+    templateCookie.value = newVal
+    loadTemplateCss(newVal)
+  })
 
   function initFromStorage() {
-    if (import.meta.client) {
-      const saved = localStorage.getItem('iblog-template') as TemplateName | null
-      if (saved && saved in TEMPLATES) {
-        template.value = saved
-      }
-    }
     loadTemplateCss(template.value)
   }
 
   function setTemplate(name: TemplateName) {
     template.value = name
-    if (import.meta.client) {
-      localStorage.setItem('iblog-template', name)
-    }
-    loadTemplateCss(name)
   }
 
   async function loadTemplateCss(name: TemplateName) {
