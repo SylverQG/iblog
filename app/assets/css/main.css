@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* 让 dark: 变体跟随 HTML 上的 .dark 类，而非系统偏好 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
   @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 antialiased;
 }

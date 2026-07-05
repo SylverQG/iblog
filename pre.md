@@ -50,49 +50,54 @@ flowchart LR
 
 ---
 
-## 4. 项目结构（初步规划）
+## 4. 项目结构（实际实现）
 
 ```
 iblog/
-├── .github/
-│   ├── ISSUE_TEMPLATE/        # Issue 模板（方便写博客）
-│   │   └── blog.md
-│   └── workflows/             # GitHub Actions 自动化（可选）
-│
-├── server/                    # Nuxt 服务端 API（替代独立后端）
-│   ├── api/
-│   │   ├── posts.get.ts      # GET /api/posts — 文章列表
-│   │   ├── posts/[id].get.ts # GET /api/posts/[id] — 文章详情
-│   │   ├── tags.get.ts       # GET /api/tags — 标签列表
-│   │   └── webhook.post.ts   # POST /api/webhook — Webhook 接收
-│   ├── utils/
-│   │   └── github.ts         # GitHub API 调用封装（octokit）
-│   └── types/
-│       └── blog.ts           # TypeScript 类型定义
-│
-├── pages/                     # 页面
-│   ├── index.vue             # 首页 — 文章列表
-│   ├── posts/
-│   │   └── [id].vue          # 文章详情页
-│   ├── tags/
-│   │   ├── index.vue         # 所有标签
-│   │   └── [tag].vue         # 按标签筛选
-│   └── about.vue             # 关于页
-│
-├── components/                # 可复用组件
-│   ├── PostCard.vue
-│   ├── TagBadge.vue
-│   └── AppHeader.vue
-│
-├── composables/               # 组合式函数
-│   └── usePosts.ts
-│
-├── app.vue
-├── nuxt.config.ts
+├── .env.example                 # 环境变量示例
+├── .gitignore
+├── nuxt.config.ts               # Nuxt 4 配置（含 Tailwind v4 + ColorMode + Vercel）
 ├── package.json
+├── pnpm-workspace.yaml          # pnpm 构建许可
 ├── tsconfig.json
-└── .env.example              # 环境变量示例
+│
+├── app/                         # Nuxt 4 应用层
+│   ├── app.vue                  # 主布局（Header + Footer + 暗色模式）
+│   ├── assets/
+│   │   └── css/
+│   │       └── main.css         # Tailwind v4 CSS-first 配置 + 博客排版
+│   ├── components/
+│   │   ├── AppHeader.vue        # 导航栏（含暗色模式切换）
+│   │   ├── PostCard.vue         # 文章卡片
+│   │   └── TagBadge.vue         # 标签徽章
+│   ├── composables/
+│   │   └── usePosts.ts          # 数据获取封装
+│   └── pages/
+│       ├── index.vue             # 首页 — 文章列表
+│       ├── about.vue             # 关于页
+│       ├── posts/
+│       │   └── [id].vue          # 文章详情页（Markdown 渲染）
+│       └── tags/
+│           ├── index.vue         # 所有标签
+│           └── [tag].vue         # 按标签筛选
+│
+├── server/                      # Nuxt 服务端 API（文件路由）
+│   ├── api/
+│   │   ├── posts.get.ts         # GET /api/posts — 文章列表（分页 + 标签筛选）
+│   │   ├── posts/[id].get.ts    # GET /api/posts/:id — 文章详情
+│   │   ├── tags.get.ts          # GET /api/tags — 标签统计
+│   │   └── webhook.post.ts      # POST /api/webhook — Webhook 接收
+│   ├── types/
+│   │   └── blog.ts              # TypeScript 类型定义（BlogPost, BlogTag 等）
+│   └── utils/
+│       └── github.ts            # octokit 封装，调用 GitHub Issues API
+│
+└── .nuxt/ .output/ .vercel/     # 构建产物（.gitignore 已忽略）
 ```
+
+### 目录命名说明（Nuxt 4 规范）
+
+> Nuxt 4 要求 `pages/`、`components/`、`composables/`、`assets/`、`app.vue` 都放在 `app/` 目录下，`server/` 保留在根目录。这是 Nuxt 4 与 Nuxt 3 最主要的目录结构变化。
 
 ---
 
@@ -154,15 +159,17 @@ assignees: ""
 | `server/api/tags.get.ts` | `GET /api/tags` | 获取所有标签及文章数 |
 | `server/api/webhook.post.ts` | `POST /api/webhook` | GitHub Webhook，Issue 变更时触发更新 |
 
-### 关键依赖（初版）
+### 关键依赖（实际使用）
 | 包 | 版本 | 用途 |
 |---|------|------|
 | `nuxt` | ^4.4.8 | 应用框架 |
-| `octokit` | 最新 | GitHub API 官方 SDK（TypeScript 原生支持） |
-| `tailwindcss` | ^4.3.1 | 原子化 CSS 框架 |
-| `@tailwindcss/vite` | 最新 | Tailwind v4 的 Vite 插件（Nuxt 原生兼容） |
-| `marked` 或 `@nuxtjs/mdc` | 最新 | Markdown 渲染 |
-| `@nuxtjs/color-mode` | 最新 | 暗色模式（可选） |
+| `vue` | ^3.5.38 | 前端框架（Nuxt 内置） |
+| `vue-router` | ^5.1.0 | 路由（Nuxt 内置） |
+| `octokit` | ^5.0.5 | GitHub API 官方 SDK（TypeScript 原生支持） |
+| `tailwindcss` | ^4.3.2 | 原子化 CSS 框架 |
+| `@tailwindcss/vite` | ^4.3.2 | Tailwind v4 的 Vite 插件（Nuxt 原生兼容） |
+| `marked` | ^18.0.5 | Markdown → HTML 渲染 |
+| `@nuxtjs/color-mode` | ^4.0.1 | 暗色模式切换 |
 
 > **Tailwind v4 注意**：v4 采用 CSS-first 配置，不再需要 `tailwind.config.js`。在 `nuxt.config.ts` 中添加 `@tailwindcss/vite` 插件后，直接在 CSS 中通过 `@import "tailwindcss"` 使用。
 
@@ -193,8 +200,8 @@ iblog 代码仓库（包含页面 + server/api）
 ```
 
 - 连接 `SylverQG/iblog` 仓库，Vercel 自动检测 Nuxt 4 项目
-- 配置 `nuxt.config.ts` 的 `nitro: { preset: 'vercel' }`
-- 在 Vercel Dashboard 设置环境变量：
+- 项目中 `nuxt.config.ts` 已配置 `nitro: { preset: 'vercel' }`
+- 在 Vercel Dashboard 的 Settings → Environment Variables 设置：
 
 | 变量 | 值 | 说明 |
 |------|-----|------|
@@ -211,42 +218,45 @@ iblog 代码仓库（包含页面 + server/api）
 ## 9. 前期准备清单
 
 ### 9.1 账号 & 工具
-- [ ] 注册/登录 GitHub 账号
-- [ ] 注册/登录 Vercel 账号（建议用 GitHub OAuth 登录）
-- [ ] 本地安装 Git
-- [ ] 本地安装 Node.js 24.x LTS 及 pnpm（推荐） / npm
+- [x] 注册/登录 GitHub 账号
+- [x] 注册/登录 Vercel 账号（建议用 GitHub OAuth 登录）
+- [x] 本地安装 Git
+- [x] 本地安装 Node.js 24.x LTS 及 pnpm（推荐） / npm
 - [ ] 本地安装 VS Code（可选，推荐）
 
 ### 9.2 GitHub 准备工作
-- [ ] 确认 `SylverQG/Blogs` 是公开仓库，Issues 已启用 ✅（已有 10 篇博客）
-- [ ] 创建 `SylverQG/iblog` 代码仓库
-- [ ] 生成 GitHub Personal Access Token（用于 Nuxt 4 server/api 调用 GitHub API）
+- [x] 确认 `SylverQG/Blogs` 是公开仓库，Issues 已启用（已有 10 篇博客）
+- [x] 创建 `SylverQG/iblog` 代码仓库
+- [x] 生成 GitHub Personal Access Token（用于 Nuxt server/api 调用 GitHub API）
   - 权限：`repo` (public repo) / `issues:read`
 - [ ] 可选：在 `SylverQG/Blogs` 配置 Issue 模板
 
 ### 9.3 本地开发环境
-- [ ] `pnpm dlx nuxi@latest init .` 初始化项目
-- [ ] 安装依赖：`nuxt`, `octokit`, `tailwindcss`, `@tailwindcss/vite`, `marked` 等
-- [ ] 配置 `nuxt.config.ts`：添加 `@tailwindcss/vite` 插件
-- [ ] 配置开发/生产环境变量（`.env`）
+- [x] `pnpm dlx nuxi@latest init .` 初始化项目
+- [x] 安装依赖：`nuxt`, `octokit`, `tailwindcss`, `@tailwindcss/vite`, `marked` 等
+- [x] 配置 `nuxt.config.ts`：添加 `@tailwindcss/vite` 插件
+- [x] 配置开发/生产环境变量（`.env`） — 需自行填入 GITHUB_TOKEN
+- [x] 验证项目可正常构建和启动
 
-### 9.4 第一批博客准备
-- [ ] 写一篇「博客搭建记」作为第一篇 Issue（记录项目搭建过程）
-- [ ] 写 2-3 篇示例内容用于开发调试
+
+### 9.4 Vercel 部署
+- [x] 登录 [vercel.com](https://vercel.com)（用 GitHub OAuth）
+- [x] 导入 `SylverQG/iblog` 仓库
+- [x] 在 Settings → Environment Variables 填入 `GITHUB_TOKEN`、`GITHUB_OWNER`、`GITHUB_REPO`
 
 ---
 
-## 10. 迭代路线图（建议）
+## 10. 迭代路线图
 
-| 阶段 | 内容 | 目标 |
-|------|------|------|
-| **Phase 1** | 项目初始化，搭建基础框架 | 本地能跑通前后端联调 |
-| **Phase 2** | 后端 GitHub API 集成 | 能从仓库 Issues 读取内容 |
-| **Phase 3** | 前端展示博客列表 + 详情 | 基本的博客浏览体验 |
-| **Phase 4** | 标签系统、分类导航 | 内容组织完整 |
-| **Phase 5** | Vercel 部署上线 | 公网可访问 |
-| **Phase 6** | Webhook 自动同步、Giscus 评论等 | 自动化体验 |
-| **Phase 7** | SEO 优化、RSS、暗色模式等 | 功能完善 |
+| 阶段 | 内容 | 目标 | 状态 |
+|------|------|------|------|
+| **Phase 1** | 项目初始化，搭建基础框架 | 本地能跑通前后端联调 | ✅ 完成 |
+| **Phase 2** | 后端 GitHub API 集成 | 能从仓库 Issues 读取内容 | ✅ 完成 |
+| **Phase 3** | 前端展示博客列表 + 详情 | 基本的博客浏览体验 | ✅ 完成 |
+| **Phase 4** | 标签系统、分类导航 | 内容组织完整 | ✅ 完成 |
+| **Phase 5** | Vercel 部署上线 | 公网可访问 | ✅ 完成 |
+| **Phase 6** | Webhook 自动同步、Giscus 评论等 | 自动化体验 | ⬜ 待开发 |
+| **Phase 7** | SEO 优化、RSS、暗色模式等 | 功能完善 | ⬜ 待开发 |
 
 ---
 
